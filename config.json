@@ -1,0 +1,62 @@
+{
+  "host": {
+    "label": "Host",
+    "type": "String",
+    "required": true,
+    "help": "Please provide the host to use."
+  },
+    "smtp_port": {
+    "label": "SMTP Port",
+    "type": "Number",
+    "required": false,
+    "help": "Please provide the SMTP Port to use(defaults to 25 or 465)."
+  },
+  "ssl": {
+    "label": "Use SSL",
+    "type": "Boolean",
+    "required": true,
+    "help": "Choose to use SSL or not."
+  },
+  "email": {
+	"label": "Email",
+	"type": "String",
+	"required": true,
+	"help": "Please provide an email address to use."
+  },
+  "password": {
+	"label": "Password",
+	"type": "Password",
+	"required": true,
+	"help": "Please provide your email's password"
+  },
+  "default_html_message": {
+    "label": "Default HTML Message",
+    "type": "String",
+    "required": true,
+    "help": "Please provide your email's default HTML message."
+  },
+  "default_text_message": {
+  "label": "Default Text Message",
+  "type": "String",
+  "required": true,
+  "help": "Please provide your email's default text message."
+},
+  "default_sender": {
+    "label": "Default Sender",
+    "type": "String",
+    "required": true,
+    "help": "Please provide your email's default sender."
+  },
+  "default_receiver": {
+    "label": "Default Receiver",
+    "type": "String",
+    "required": true,
+    "help": "Please provide your email's default receiver."
+  },
+  "default_subject":{
+    "label": "Default Subject",
+    "type": "String",
+    "required": true,
+    "help": "Please provide your email's default subject."
+  }
+}
