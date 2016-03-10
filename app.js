@@ -2,56 +2,67 @@
 
 var platform = require('./platform'),
     isEmpty = require('lodash.isempty'),
+    isArray = require('lodash.isarray'),
+    async = require('async'),
     isPlainObject = require('lodash.isplainobject'),
 	config,
     smtpClient;
 
+let sendData = (data) => {
+    if(isEmpty(data.sender))
+        data.sender = config.default_sender;
+
+    if(isEmpty(data.receiver))
+        data.receiver = config.default_receiver;
+
+    if(isEmpty(data.message_html))
+        data.message = config.default_html_message;
+
+    if(isEmpty(data.message_text))
+        data.message = config.default_text_message;
+
+    if(isEmpty(data.subject))
+        data.subject = config.default_subject;
+
+    var mail_options = {
+        from: data.sender,
+        to: data.receiver,
+        subject: data.subject,
+        html: data.html_message,
+        text: data.text_message
+    };
+
+    if(!isEmpty(data.cc))
+        mail_options.cc = data.cc;
+
+    if(!isEmpty(data.bcc))
+        mail_options.bcc = data.bcc;
+
+    smtpClient.sendMail(mail_options, function(error, info) {
+        if(error){
+            console.error(error);
+            platform.handleException(error);
+        }
+        else{
+            platform.log(JSON.stringify({
+                title: 'SMTP Email sent.',
+                data: data
+            }));
+        }
+    });
+};
+
 platform.on('data', function (data) {
 	if(isPlainObject(data)){
-        if(isEmpty(data.sender))
-            data.sender = config.default_sender;
-
-        if(isEmpty(data.receiver))
-            data.receiver = config.default_receiver;
-
-        if(isEmpty(data.message_html))
-            data.message = config.default_html_message;
-
-        if(isEmpty(data.message_text))
-            data.message = config.default_text_message;
-
-        if(isEmpty(data.subject))
-            data.subject = config.default_subject;
-
-        var mail_options = {
-            from: data.sender,
-            to: data.receiver,
-            subject: data.subject,
-            html: data.html_message,
-            text: data.text_message
-        };
-
-        if(!isEmpty(data.cc))
-            mail_options.cc = data.cc;
-
-        if(!isEmpty(data.bcc))
-            mail_options.bcc = data.bcc;
-
-        smtpClient.sendMail(mail_options, function(error, info) {
-            if(error){
-                console.error(error);
-                platform.handleException(error);
-            }
-            else{
-                platform.log(JSON.stringify({
-                    title: 'SMTP Email sent.',
-                    data: data
-                }));
-            }
+        sendData(data);
+    }
+    else if(isArray(data)){
+        async.each(data, (datum) => {
+            sendData(datum);
         });
     }
     else
-        platform.handleException(new Error('Invalid data received. Must be a valid JSON Object. Data ' + data));
+        platform.handleException(new Error('Invalid data received. Must be a valid Array/JSON Object. Data ' + data));
 });
 
 platform.once('close', function () {
