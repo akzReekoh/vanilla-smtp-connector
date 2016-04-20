@@ -8,7 +8,7 @@ var platform = require('./platform'),
 	config,
     smtpClient;
 
-let sendData = (data) => {
+let sendData = (data, callback) => {
     if(isEmpty(data.sender))
         data.sender = config.default_sender;
 
@@ -39,26 +39,34 @@ let sendData = (data) => {
         mail_options.bcc = data.bcc;
 
     smtpClient.sendMail(mail_options, function(error, info) {
-        if(error){
-            console.error(error);
-            platform.handleException(error);
-        }
-        else{
+        if(!error){
             platform.log(JSON.stringify({
                 title: 'SMTP Email sent.',
                 data: data
             }));
         }
+
+        callback(error);
     });
 };
 
 platform.on('data', function (data) {
-	if(isPlainObject(data)){
-        sendData(data);
+    if(isPlainObject(data)){
+        sendData(data, (error) => {
+            if(error) {
+                console.error(error);
+                platform.handleException(error);
+            }
+        });
     }
     else if(isArray(data)){
-        async.each(data, (datum) => {
-            sendData(datum);
+        async.each(data, (datum, done) => {
+            sendData(datum, done);
+        }, (error) => {
+            if(error) {
+                console.error(error);
+                platform.handleException(error);
+            }
         });
     }
     else
