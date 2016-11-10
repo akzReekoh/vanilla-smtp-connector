@@ -87,8 +87,7 @@ platform.once('ready', function (options) {
             user: options.email,
             pass: options.password
         },
-        authMethod: 'PLAIN',
-        connectionTimeout: 10000
+        connectionTimeout: 15000
     };
 
     if(options.smtp_port !== 'undefined')

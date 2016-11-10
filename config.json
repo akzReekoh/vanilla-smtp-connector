@@ -14,7 +14,7 @@
   "ssl": {
     "label": "Use SSL",
     "type": "Boolean",
-    "required": true,
+    "required": false,
     "help": "Choose to use SSL or not."
   },
   "email": {
