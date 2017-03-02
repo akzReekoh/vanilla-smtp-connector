@@ -1,102 +1,109 @@
-'use strict';
+'use strict'
 
-var platform = require('./platform'),
-    isEmpty = require('lodash.isempty'),
-    isArray = require('lodash.isarray'),
-    async = require('async'),
-    isPlainObject = require('lodash.isplainobject'),
-	config,
-    smtpClient;
-
+let reekoh = require('reekoh')
+let _plugin = new reekoh.plugins.Connector()
+let async = require('async')
+let isArray = require('lodash.isarray')
+let isEmpty = require('lodash.isempty')
+let isPlainObject = require('lodash.isplainobject')
+let smtpClient = null
 let sendData = (data, callback) => {
-    if(isEmpty(data.sender))
-        data.sender = config.default_sender;
+  if (isEmpty(data.sender)) { data.sender = _plugin.config.defaultSender }
 
-    if(isEmpty(data.receiver))
-        data.receiver = config.default_receiver;
+  if (isEmpty(data.receiver)) {
+    data.receiver = _plugin.config.defaultReceiver
+  }
 
-    if(isEmpty(data.message_html))
-        data.message = config.default_html_message;
+  if (isEmpty(data.htmlMessage)) {
+    data.message = _plugin.config.defaultHtmlMessage
+  }
 
-    if(isEmpty(data.message_text))
-        data.message = config.default_text_message;
+  if (isEmpty(data.textMessage)) {
+    data.message = _plugin.config.defaultTextMessage
+  }
 
-    if(isEmpty(data.subject))
-        data.subject = config.default_subject;
+  if (isEmpty(data.subject)) {
+    data.subject = _plugin.config.defaultSubject
+  }
 
-    var mail_options = {
-        from: data.sender,
-        to: data.receiver,
-        subject: data.subject,
-        html: data.html_message,
-        text: data.text_message
-    };
+  var mailOptions = {
+    from: data.sender,
+    to: data.receiver,
+    subject: data.subject,
+    html: data.htmlMessage,
+    text: data.textMessage
+  }
 
-    if(!isEmpty(data.cc))
-        mail_options.cc = data.cc;
+  if (!isEmpty(data.cc)) {
+    mailOptions.cc = data.cc
+  }
 
-    if(!isEmpty(data.bcc))
-        mail_options.bcc = data.bcc;
+  if (!isEmpty(data.bcc)) {
+    mailOptions.bcc = data.bcc
+  }
 
-    smtpClient.sendMail(mail_options, function(error, info) {
-        if(!error){
-            platform.log(JSON.stringify({
-                title: 'SMTP Email sent.',
-                data: data
-            }));
-        }
-
-        callback(error);
-    });
-};
-
-platform.on('data', function (data) {
-    if(isPlainObject(data)){
-        sendData(data, (error) => {
-            if(error) {
-                console.error(error);
-                platform.handleException(error);
-            }
-        });
+  smtpClient.sendMail(mailOptions, (error) => {
+    if (!error) {
+      _plugin.log(JSON.stringify({
+        title: 'SMTP Email sent.',
+        data: data
+      }))
     }
-    else if(isArray(data)){
-        async.each(data, (datum, done) => {
-            sendData(datum, done);
-        }, (error) => {
-            if(error) {
-                console.error(error);
-                platform.handleException(error);
-            }
-        });
-    }
-    else
-        platform.handleException(new Error('Invalid data received. Must be a valid Array/JSON Object. Data ' + data));
-});
 
-platform.once('close', function () {
-    platform.notifyClose();
-});
+    callback(error)
+  })
+}
 
-platform.once('ready', function (options) {
-    config = options;
+/**
+ * Emitted when device data is received.
+ * This is the event to listen to in order to get real-time data feed from the connected devices.
+ * @param {object} data The data coming from the device represented as JSON Object.
+ */
+_plugin.on('data', (data) => {
+  if (isPlainObject(data)) {
+    sendData(data, (error) => {
+      if (error) {
+        console.error(error)
+        _plugin.logException(error)
+      }
+    })
+  } else if (isArray(data)) {
+    async.each(data, (datum, done) => {
+      sendData(datum, done)
+    }, (error) => {
+      if (error) {
+        console.error(error)
+        _plugin.logException(error)
+      }
+    })
+  } else {
+    _plugin.logException(new Error('Invalid data received. Must be a valid Array/JSON Object. Data ' + data))
+  }
+})
 
-    var client_options = {
-        host: options.host,
-        secure: options.ssl,
-        auth: {
-            user: options.email,
-            pass: options.password
-        },
-        connectionTimeout: 15000
-    };
+/**
+ * Emitted when the platform bootstraps the plugin. The plugin should listen once and execute its init process.
+ */
+_plugin.once('ready', () => {
+  let clientOptions = {
+    host: _plugin.config.host,
+    secure: _plugin.config.ssl,
+    auth: {
+      user: _plugin.config.email,
+      pass: _plugin.config.password
+    },
+    connectionTimeout: 15000
+  }
 
-    if(options.smtp_port !== 'undefined')
-        client_options.port = options.smtp_port;
+  if (_plugin.config.smtpPort !== 'undefined') {
+    clientOptions.port = _plugin.config.smtpPort
+  }
 
-   var  nodemailer = require('nodemailer');
+  let nodemailer = require('nodemailer')
 
-    smtpClient = nodemailer.createTransport(client_options);
+  smtpClient = nodemailer.createTransport(clientOptions)
+  _plugin.log('SMTP Connector has been initialized.')
+  _plugin.emit('init')
+})
 
-	platform.notifyReady();
-	platform.log('Connector has been initialized.');
-});
+module.exports = _plugin

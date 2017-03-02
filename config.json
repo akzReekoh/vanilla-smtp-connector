@@ -3,9 +3,13 @@
     "label": "Host",
     "type": "String",
     "required": true,
-    "help": "Please provide the host to use."
+    "help": "Please provide the host to use.",
+    "maxLength": 50,
+    "format": {
+      "pattern": "^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])$"
+    }
   },
-    "smtp_port": {
+    "smtpPort": {
     "label": "SMTP Port",
     "type": "Number",
     "required": false,
@@ -21,7 +25,11 @@
 	"label": "Email",
 	"type": "String",
 	"required": true,
-	"help": "Please provide an email address to use."
+	"help": "Please provide an email address to use.",
+    "maxLength": 50,
+    "format": {
+      "pattern": "/^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/"
+    }
   },
   "password": {
 	"label": "Password",
@@ -29,34 +37,45 @@
 	"required": true,
 	"help": "Please provide your email's password"
   },
-  "default_html_message": {
+  "defaultHtmlMessage": {
     "label": "Default HTML Message",
     "type": "String",
     "required": true,
-    "help": "Please provide your email's default HTML message."
+    "help": "Please provide your email's default HTML message.",
+    "maxLength": 500
   },
-  "default_text_message": {
+  "defaultTextMessage": {
   "label": "Default Text Message",
   "type": "String",
   "required": true,
-  "help": "Please provide your email's default text message."
+  "help": "Please provide your email's default text message.",
+    "maxLength": 500
 },
-  "default_sender": {
+  "defaultSender": {
     "label": "Default Sender",
     "type": "String",
     "required": true,
-    "help": "Please provide your email's default sender."
+    "help": "Please provide your email's default sender.",
+    "maxLength": 50,
+    "format": {
+      "pattern": "/^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/"
+    }
   },
-  "default_receiver": {
+  "defaultReceiver": {
     "label": "Default Receiver",
     "type": "String",
     "required": true,
-    "help": "Please provide your email's default receiver."
+    "help": "Please provide your email's default receiver.",
+    "maxLength": 50,
+    "format": {
+      "pattern": "/^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/"
+    }
   },
-  "default_subject":{
+  "defaultSubject":{
     "label": "Default Subject",
     "type": "String",
     "required": true,
-    "help": "Please provide your email's default subject."
+    "help": "Please provide your email's default subject.",
+    "maxLength": 200
   }
 }
