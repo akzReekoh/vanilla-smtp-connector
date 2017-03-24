@@ -30,8 +30,8 @@ These parameters are then injected to the plugin from the platform.
 {
     sender : 'sender@domain.com',
     receiver : 'receiver@domain.com,receiver2@domain.com',
-    text_message : 'This is a test email from SMTP Connector Plugin.',
-    html_message : '<h1>This is a test email from SMTP Connector Plugin.</h1> <a href="http://reekoh.com/">Reekoh Website</a>',
+    textMessage : 'This is a test email from SMTP Connector Plugin.',
+    htmlMessage : '<h1>This is a test email from SMTP Connector Plugin.</h1> <a href="http://reekoh.com/">Reekoh Website</a>',
     bcc : 'bcc1@domain.com,bcc2@domain.com',
     cc : 'cc1@domain.com,cc2@domain.com',
     subject : 'Test email'
